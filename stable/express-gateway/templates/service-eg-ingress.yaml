@@ -2,9 +2,9 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "cds.fullname" . }}
+  name: {{ template "eg.fullname" . }}-ingress
   labels:
-    app: {{ template "cds.fullname" . }}
+    app: {{ template "eg.name" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
@@ -17,18 +17,9 @@ spec:
     - host: {{ .Values.ingress.hostname }}
       http:
         paths:
-          - path: /
-            backend:
-              serviceName: {{ template "cds.fullname" . }}-ui
-              servicePort: 80
-          - path: /api
-            backend:
-              serviceName: {{ template "cds.fullname" . }}-api
-              servicePort: 80
-          - path: /webhooks
-            backend:
-              serviceName: {{ template "cds.fullname" . }}-hooks
-              servicePort: 80
+          - backend:
+            serviceName: {{ template "eg.fullname" . }}-proxy
+            servicePort: {{ .Values.proxy.servicePort }}
 {{- if .Values.ingress.tls }}
   tls:
 {{ toYaml .Values.ingress.tls | indent 4 }}

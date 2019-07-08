@@ -12,7 +12,13 @@ To connect from outside the K8s cluster:
      PORT=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "eg.fullname" . }}-admin -o jsonpath='{.spec.ports[0].nodePort}')
 
    {{- else if contains "ClusterIP" .Values.admin.type }}
+    {{if .Values.ingress.enabled }}
+      HOST={{ .Values.ingress.hostname }}
+      PORT={{ .Values.admin.servicePort }}
+    {{else}}
      HOST=127.0.0.1
+    {{end}}
+
 
      # Execute the following commands to route the connection to Admin SSL port:
      export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "release={{ .Release.Name }}, app={{ template "eg.name" . }}" -o jsonpath="{.items[0].metadata.name}")
